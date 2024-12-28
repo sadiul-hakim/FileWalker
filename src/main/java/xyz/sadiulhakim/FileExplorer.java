@@ -1,16 +1,22 @@
 package xyz.sadiulhakim;
 
+import xyz.sadiulhakim.executor.CustomCommandExecutor;
+import xyz.sadiulhakim.executor.ProcessAccessor;
 import xyz.sadiulhakim.util.AppLogger;
+import xyz.sadiulhakim.util.DateUtil;
 import xyz.sadiulhakim.util.MathUtil;
+import xyz.sadiulhakim.util.NumberFormat;
 
 import java.io.File;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FileExplorer {
-
     private static final Scanner INPUT = new Scanner(System.in);
+    private static final int FILE_NAME_LENGTH = 85;
+    private static final String CUSTOM_COMMAND_SIGN = "[$]";
 
     private FileExplorer() {
     }
@@ -69,23 +75,49 @@ public class FileExplorer {
     private static void processCommand(String[] commands, File[] files, List<File> visitedPaths) {
         try {
 
-            // Replace file index with file path
-            for (int i = 0; i < commands.length; i++) {
-                if (commands[i].startsWith("[") && commands[i].endsWith("]")) {
-                    String command = commands[i];
-                    String innerText = command.replace("[", "")
-                            .replace("]", "");
-                    int fileIndex = MathUtil.intValue(innerText);
-                    commands[i] = files[fileIndex - 1].getAbsolutePath();
-                } else if (commands[i].contains("[/]")) {
-                    commands[i] = commands[i].replace("[/]", visitedPaths.getLast().getAbsolutePath());
-                }
+            preProcess(commands, files, visitedPaths);
+            if (commands[0].equals(CUSTOM_COMMAND_SIGN)) {
+                processCustomCommand(commands, files, visitedPaths);
+                return;
             }
-
             String result = ProcessAccessor.execute(commands);
             System.out.println(result);
         } catch (Exception ex) {
             AppLogger.error(ex.getMessage());
+        }
+    }
+
+    private static void processCustomCommand(String[] commands, File[] files, List<File> visitedPaths) {
+
+        String rootCommand = commands[1];
+        switch (rootCommand) {
+            case "make" -> CustomCommandExecutor.makeCommand(commands);
+            case "makeDir" -> CustomCommandExecutor.makeDirCommand(commands);
+            case "delete" -> CustomCommandExecutor.delCommand(commands);
+            case "append" -> CustomCommandExecutor.appendCommand(commands);
+            case "rename" -> CustomCommandExecutor.renameCommand(commands);
+            case "move" -> CustomCommandExecutor.moveCommand(commands);
+            case "copy" -> CustomCommandExecutor.copyCommand(commands);
+            case "watch" -> CustomCommandExecutor.watchCommand(commands, files, visitedPaths);
+        }
+    }
+
+    private static void preProcess(String[] commands, File[] files, List<File> visitedPaths) {
+        for (int i = 0; i < commands.length; i++) {
+            if (commands[i].startsWith("[") && commands[i].endsWith("]")) {
+                String command = commands[i];
+                String innerText = command.replace("[", "")
+                        .replace("]", "");
+
+                if (!MathUtil.isInt(innerText)) {
+                    continue;
+                }
+
+                int fileIndex = MathUtil.intValue(innerText);
+                commands[i] = files[fileIndex - 1].getAbsolutePath();
+            } else if (commands[i].contains("[/]")) {
+                commands[i] = commands[i].replace("[/]", visitedPaths.getLast().getAbsolutePath());
+            }
         }
     }
 
@@ -97,9 +129,32 @@ public class FileExplorer {
             System.out.println("> " + visitedPaths.getLast().getAbsolutePath());
         }
         for (int i = 0; i < files.length; i++) {
-            System.out.println((i + 1) + ". " + files[i].getAbsolutePath());
+            printFileInfo(files[i], i);
         }
 
         System.out.print(": ");
+    }
+
+    private static void printFileInfo(File file, int i) {
+
+        String path = file.getAbsolutePath();
+        String finalPath = (path.length() > FILE_NAME_LENGTH) ?
+                path.substring(0, FILE_NAME_LENGTH) :
+                String.format("%-" + FILE_NAME_LENGTH + "s", path);
+        String index = i < 9 ? "0" + (i + 1) : (i + 1) + "";
+        System.out.println(index + ". " +
+                finalPath + " ".repeat(10) +
+                getFileDate(file) + " ".repeat(5) +
+                getFileLength(file) + " MB");
+    }
+
+    private static String getFileDate(File file) {
+        OffsetDateTime dateTime = DateUtil.readableDate(file.lastModified());
+        return DateUtil.format(dateTime);
+    }
+
+    private static String getFileLength(File file) {
+        double length = (file.length() / (1024.0 * 1024.0));
+        return NumberFormat.format(length);
     }
 }
