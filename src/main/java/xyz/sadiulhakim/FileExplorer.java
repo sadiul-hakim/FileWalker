@@ -94,10 +94,10 @@ public class FileExplorer {
 
     private static void processCustomCommand(String[] commands, List<File> visitedPaths) {
 
-        String rootCommand = commands[1];
+        String rootCommand = commands[1].toLowerCase();
         switch (rootCommand) {
             case "make" -> CustomCommandExecutor.makeCommand(commands, visitedPaths);
-            case "makeDir" -> CustomCommandExecutor.makeDirCommand(commands, visitedPaths);
+            case "makedir" -> CustomCommandExecutor.makeDirCommand(commands, visitedPaths);
             case "delete" -> CustomCommandExecutor.delCommand(commands);
             case "append" -> CustomCommandExecutor.appendCommand(commands);
             case "rename" -> CustomCommandExecutor.renameCommand(commands, visitedPaths);

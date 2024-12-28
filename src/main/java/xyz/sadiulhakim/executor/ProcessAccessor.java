@@ -19,7 +19,13 @@ public class ProcessAccessor {
 
     public static String execute(String... commands) {
         try {
-            ArrayList<String> commandList = new ArrayList<>(PRE_COMMAND);
+            ArrayList<String> commandList;
+            if (SYSTEM.contains("win")) {
+                commandList = new ArrayList<>(PRE_COMMAND);
+            } else {
+                commandList = new ArrayList<>();
+            }
+
             commandList.addAll(Arrays.asList(commands));
 
             ProcessBuilder builder = new ProcessBuilder(commandList);
@@ -39,7 +45,13 @@ public class ProcessAccessor {
 
     public static void explore(String filePath) {
         try {
-            ArrayList<String> commandList = new ArrayList<>(PRE_COMMAND);
+            ArrayList<String> commandList;
+            if (SYSTEM.contains("win")) {
+                commandList = new ArrayList<>(PRE_COMMAND);
+            } else {
+                commandList = new ArrayList<>();
+            }
+
             commandList.add(filePath);
             new ProcessBuilder(commandList).inheritIO().start().waitFor();
         } catch (Exception ex) {
