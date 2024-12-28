@@ -82,7 +82,7 @@ public class FileExplorer {
 
             preProcess(commands, files, visitedPaths);
             if (commands[0].equals(CUSTOM_COMMAND_SIGN)) {
-                processCustomCommand(commands, files, visitedPaths);
+                processCustomCommand(commands, visitedPaths);
                 return;
             }
             String result = ProcessAccessor.execute(commands);
@@ -92,15 +92,15 @@ public class FileExplorer {
         }
     }
 
-    private static void processCustomCommand(String[] commands, File[] files, List<File> visitedPaths) {
+    private static void processCustomCommand(String[] commands, List<File> visitedPaths) {
 
         String rootCommand = commands[1];
         switch (rootCommand) {
-            case "make" -> CustomCommandExecutor.makeCommand(commands);
-            case "makeDir" -> CustomCommandExecutor.makeDirCommand(commands);
+            case "make" -> CustomCommandExecutor.makeCommand(commands, visitedPaths);
+            case "makeDir" -> CustomCommandExecutor.makeDirCommand(commands, visitedPaths);
             case "delete" -> CustomCommandExecutor.delCommand(commands);
             case "append" -> CustomCommandExecutor.appendCommand(commands);
-            case "rename" -> CustomCommandExecutor.renameCommand(commands);
+            case "rename" -> CustomCommandExecutor.renameCommand(commands, visitedPaths);
             case "move" -> CustomCommandExecutor.moveCommand(commands);
             case "copy" -> CustomCommandExecutor.copyCommand(commands);
             case "watch" -> CustomCommandExecutor.watchCommand(commands);

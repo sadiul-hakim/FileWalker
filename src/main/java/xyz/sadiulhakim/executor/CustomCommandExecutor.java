@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.Scanner;
 
 public class CustomCommandExecutor {
@@ -18,12 +19,16 @@ public class CustomCommandExecutor {
     private CustomCommandExecutor() {
     }
 
-    public static void makeCommand(String[] commands) {
-        FileUtil.make(commands[2]);
+    public static void makeCommand(String[] commands, List<File> visitedPaths) {
+        String folderName = commands[2];
+        String fullPath = visitedPaths.getLast() + File.separator + folderName;
+        FileUtil.make(fullPath);
     }
 
-    public static void makeDirCommand(String[] commands) {
-        FileUtil.makeDir(commands[2]);
+    public static void makeDirCommand(String[] commands, List<File> visitedPaths) {
+        String filePath = commands[2];
+        String fullPath = visitedPaths.getLast() + File.separator + filePath;
+        FileUtil.makeDir(fullPath);
     }
 
     public static void delCommand(String[] commands) {
@@ -67,18 +72,14 @@ public class CustomCommandExecutor {
         }
     }
 
-    public static void renameCommand(String[] commands) {
+    public static void renameCommand(String[] commands, List<File> visitedPaths) {
 
         try {
             String source = commands[2];
-            String target = commands[3];
+            String targetFile = commands[3];
+            String targetFullPath = visitedPaths.getLast() + File.separator + targetFile;
 
-            Path targetPath = Path.of(target);
-            if (!Files.exists(targetPath)) {
-                Files.createFile(targetPath);
-            }
-
-            Files.move(Path.of(source), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.move(Path.of(source), Path.of(targetFullPath), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception ex) {
             AppLogger.error(ex.getMessage());
         }
