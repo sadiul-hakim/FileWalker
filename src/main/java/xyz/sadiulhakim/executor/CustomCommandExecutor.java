@@ -2,15 +2,19 @@ package xyz.sadiulhakim.executor;
 
 import xyz.sadiulhakim.util.AppLogger;
 import xyz.sadiulhakim.util.FileUtil;
+import xyz.sadiulhakim.watcher.FileWatcher;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
+import java.util.Scanner;
 
 public class CustomCommandExecutor {
+
+    private static final Scanner INPUT = new Scanner(System.in);
+
     private CustomCommandExecutor() {
     }
 
@@ -112,6 +116,19 @@ public class CustomCommandExecutor {
         }
     }
 
-    public static void watchCommand(String[] commands, File[] files, List<File> visitedPaths) {
+    public static void watchCommand(String[] commands) {
+        String filePath = commands[2];
+        Thread watcherThread = Thread.ofPlatform().start(() -> FileWatcher.watch(filePath));
+
+        ProcessAccessor.clear();
+        System.out.println("Watching " + filePath + " ......");
+        while (true) {
+            System.out.print(": ");
+            String command = INPUT.nextLine();
+            if (command.equalsIgnoreCase("q")) {
+                watcherThread.interrupt();
+                break;
+            }
+        }
     }
 }

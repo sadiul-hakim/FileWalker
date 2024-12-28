@@ -44,6 +44,11 @@ public class FileExplorer {
                 walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
             }
 
+            if (!MathUtil.isInt(text)) {
+                ProcessAccessor.execute(text);
+                walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
+            }
+
             index = Integer.parseInt(text);
 
             while (index < 0 || index > files.length || (index == 0 && track.isEmpty())) {
@@ -98,7 +103,7 @@ public class FileExplorer {
             case "rename" -> CustomCommandExecutor.renameCommand(commands);
             case "move" -> CustomCommandExecutor.moveCommand(commands);
             case "copy" -> CustomCommandExecutor.copyCommand(commands);
-            case "watch" -> CustomCommandExecutor.watchCommand(commands, files, visitedPaths);
+            case "watch" -> CustomCommandExecutor.watchCommand(commands);
         }
     }
 

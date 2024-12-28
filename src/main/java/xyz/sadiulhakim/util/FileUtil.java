@@ -14,7 +14,7 @@ public class FileUtil {
             try {
                 Files.delete(path);
             } catch (IOException e) {
-                AppLogger.error(e.getMessage());
+                AppLogger.error("Could not delete " + e.getMessage());
             }
         }
     }
