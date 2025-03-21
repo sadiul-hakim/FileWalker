@@ -2,10 +2,7 @@ package xyz.sadiulhakim;
 
 import xyz.sadiulhakim.executor.CustomCommandExecutor;
 import xyz.sadiulhakim.executor.ProcessAccessor;
-import xyz.sadiulhakim.util.AppLogger;
-import xyz.sadiulhakim.util.DateUtil;
-import xyz.sadiulhakim.util.MathUtil;
-import xyz.sadiulhakim.util.NumberFormat;
+import xyz.sadiulhakim.util.*;
 
 import java.io.File;
 import java.time.OffsetDateTime;
@@ -13,10 +10,11 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static xyz.sadiulhakim.util.CommandUtil.*;
+
 public class FileExplorer {
     private static final Scanner INPUT = new Scanner(System.in);
     private static final int FILE_NAME_LENGTH = 85;
-    private static final String CUSTOM_COMMAND_SIGN = "[$]";
 
     private FileExplorer() {
     }
@@ -31,7 +29,7 @@ public class FileExplorer {
         try {
             printPaths(files, visitedPaths);
             String text = INPUT.nextLine();
-            if (text.equalsIgnoreCase("q")) {
+            if (text.isEmpty() || text.equalsIgnoreCase(EXIT_COMMAND)) {
                 return;
             }
 
@@ -45,7 +43,7 @@ public class FileExplorer {
             }
 
             if (!MathUtil.isInt(text)) {
-                ProcessAccessor.execute(text);
+                Thread.ofVirtual().start(() -> ProcessAccessor.execute(text));
                 walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
             }
 
@@ -65,7 +63,8 @@ public class FileExplorer {
             }
 
             if (files[index - 1].isFile()) {
-                ProcessAccessor.explore(files[index - 1].getAbsolutePath());
+                String absolutePath = files[index - 1].getAbsolutePath();
+                Thread.ofVirtual().start(() -> ProcessAccessor.explore(absolutePath));
                 walk(files, track, visitedPaths);
             }
 
@@ -80,13 +79,15 @@ public class FileExplorer {
     private static void processCommand(String[] commands, File[] files, List<File> visitedPaths) {
         try {
 
+            // Replace wildcards
             preProcess(commands, files, visitedPaths);
             if (commands[0].equals(CUSTOM_COMMAND_SIGN)) {
                 processCustomCommand(commands, visitedPaths);
                 return;
             }
-            String result = ProcessAccessor.execute(commands);
-            System.out.println(result);
+
+            // Or, Process system specific command
+            Thread.ofVirtual().start(() -> ProcessAccessor.execute(commands));
         } catch (Exception ex) {
             AppLogger.error(ex.getMessage());
         }
@@ -96,19 +97,21 @@ public class FileExplorer {
 
         String rootCommand = commands[1].toLowerCase();
         switch (rootCommand) {
-            case "make" -> CustomCommandExecutor.makeCommand(commands, visitedPaths);
-            case "makedir" -> CustomCommandExecutor.makeDirCommand(commands, visitedPaths);
-            case "delete" -> CustomCommandExecutor.delCommand(commands);
-            case "append" -> CustomCommandExecutor.appendCommand(commands);
-            case "rename" -> CustomCommandExecutor.renameCommand(commands, visitedPaths);
-            case "move" -> CustomCommandExecutor.moveCommand(commands);
-            case "copy" -> CustomCommandExecutor.copyCommand(commands);
-            case "watch" -> CustomCommandExecutor.watchCommand(commands);
+            case CUSTOM_COMMAND_MAKE -> CustomCommandExecutor.makeCommand(commands, visitedPaths);
+            case CUSTOM_COMMAND_MAKE_DIR -> CustomCommandExecutor.makeDirCommand(commands, visitedPaths);
+            case CUSTOM_COMMAND_DELETE -> CustomCommandExecutor.delCommand(commands);
+            case CUSTOM_COMMAND_APPEND -> CustomCommandExecutor.appendCommand(commands);
+            case CUSTOM_COMMAND_RENAME -> CustomCommandExecutor.renameCommand(commands, visitedPaths);
+            case CUSTOM_COMMAND_MOVE -> CustomCommandExecutor.moveCommand(commands);
+            case CUSTOM_COMMAND_COPY -> CustomCommandExecutor.copyCommand(commands);
+            case CUSTOM_COMMAND_WATCH -> CustomCommandExecutor.watchCommand(commands);
         }
     }
 
     private static void preProcess(String[] commands, File[] files, List<File> visitedPaths) {
         for (int i = 0; i < commands.length; i++) {
+
+            // Replace path index wildcard
             if (commands[i].startsWith("[") && commands[i].endsWith("]")) {
                 String command = commands[i];
                 String innerText = command.replace("[", "")
@@ -120,7 +123,10 @@ public class FileExplorer {
 
                 int fileIndex = MathUtil.intValue(innerText);
                 commands[i] = files[fileIndex - 1].getAbsolutePath();
-            } else if (commands[i].contains("[/]")) {
+            }
+
+            // Replace current directory wildcard
+            else if (commands[i].contains("[/]")) {
                 commands[i] = commands[i].replace("[/]", visitedPaths.getLast().getAbsolutePath());
             }
         }

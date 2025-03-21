@@ -2,6 +2,7 @@ package xyz.sadiulhakim.executor;
 
 import xyz.sadiulhakim.util.AppLogger;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +18,7 @@ public class ProcessAccessor {
     private ProcessAccessor() {
     }
 
-    public static String execute(String... commands) {
+    public static void execute(String... commands) {
         try {
             ArrayList<String> commandList;
             if (SYSTEM.contains("win")) {
@@ -35,11 +36,11 @@ public class ProcessAccessor {
             long pid = process.pid();
 
             try (BufferedReader reader = process.inputReader()) {
-                return reader.lines().reduce("pid " + pid, (a, b) -> a.concat("\n").concat(b));
+                String res = reader.lines().reduce("pid " + pid, (a, b) -> a.concat("\n").concat(b));
+                JOptionPane.showMessageDialog(null, res);
             }
         } catch (Exception ex) {
             AppLogger.error(ex.getMessage());
-            return "";
         }
     }
 

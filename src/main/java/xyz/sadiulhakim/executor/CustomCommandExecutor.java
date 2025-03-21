@@ -1,6 +1,7 @@
 package xyz.sadiulhakim.executor;
 
 import xyz.sadiulhakim.util.AppLogger;
+import xyz.sadiulhakim.util.CommandUtil;
 import xyz.sadiulhakim.util.FileUtil;
 import xyz.sadiulhakim.watcher.FileWatcher;
 
@@ -20,13 +21,13 @@ public class CustomCommandExecutor {
     }
 
     public static void makeCommand(String[] commands, List<File> visitedPaths) {
-        String folderName = commands[2];
+        String folderName = commands[2].trim();
         String fullPath = visitedPaths.getLast() + File.separator + folderName;
         FileUtil.make(fullPath);
     }
 
     public static void makeDirCommand(String[] commands, List<File> visitedPaths) {
-        String filePath = commands[2];
+        String filePath = commands[2].trim();
         String fullPath = visitedPaths.getLast() + File.separator + filePath;
         FileUtil.makeDir(fullPath);
     }
@@ -126,7 +127,7 @@ public class CustomCommandExecutor {
         while (true) {
             System.out.print(": ");
             String command = INPUT.nextLine();
-            if (command.equalsIgnoreCase("q")) {
+            if (command.equalsIgnoreCase(CommandUtil.EXIT_COMMAND)) {
                 watcherThread.interrupt();
                 break;
             }
