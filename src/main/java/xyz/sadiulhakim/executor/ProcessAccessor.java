@@ -2,8 +2,6 @@ package xyz.sadiulhakim.executor;
 
 import xyz.sadiulhakim.util.AppLogger;
 
-import javax.swing.*;
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,19 +24,10 @@ public class ProcessAccessor {
             } else {
                 commandList = new ArrayList<>();
             }
-
             commandList.addAll(Arrays.asList(commands));
-
             ProcessBuilder builder = new ProcessBuilder(commandList);
             Process process = builder.start();
             process.waitFor();
-
-            long pid = process.pid();
-
-            try (BufferedReader reader = process.inputReader()) {
-                String res = reader.lines().reduce("pid " + pid, (a, b) -> a.concat("\n").concat(b));
-                JOptionPane.showMessageDialog(null, res);
-            }
         } catch (Exception ex) {
             AppLogger.error(ex.getMessage());
         }

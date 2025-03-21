@@ -2,7 +2,10 @@ package xyz.sadiulhakim;
 
 import xyz.sadiulhakim.executor.CustomCommandExecutor;
 import xyz.sadiulhakim.executor.ProcessAccessor;
-import xyz.sadiulhakim.util.*;
+import xyz.sadiulhakim.util.AppLogger;
+import xyz.sadiulhakim.util.DateUtil;
+import xyz.sadiulhakim.util.MathUtil;
+import xyz.sadiulhakim.util.NumberFormat;
 
 import java.io.File;
 import java.time.OffsetDateTime;
@@ -39,12 +42,21 @@ public class FileExplorer {
             int index;
             if (commands.length != 1) {
                 processCommand(commands, files, visitedPaths);
-                walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
+
+                if (visitedPaths.isEmpty()) {
+                    walk(files, track, visitedPaths);
+                } else {
+                    walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
+                }
             }
 
             if (!MathUtil.isInt(text)) {
                 Thread.ofVirtual().start(() -> ProcessAccessor.execute(text));
-                walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
+                if (visitedPaths.isEmpty()) {
+                    walk(files, track, visitedPaths);
+                } else {
+                    walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
+                }
             }
 
             index = Integer.parseInt(text);
@@ -105,6 +117,7 @@ public class FileExplorer {
             case CUSTOM_COMMAND_MOVE -> CustomCommandExecutor.moveCommand(commands);
             case CUSTOM_COMMAND_COPY -> CustomCommandExecutor.copyCommand(commands);
             case CUSTOM_COMMAND_WATCH -> CustomCommandExecutor.watchCommand(commands);
+            case CUSTOM_COMMAND_MONITOR_RESOURCE -> CustomCommandExecutor.monitorResource();
         }
     }
 

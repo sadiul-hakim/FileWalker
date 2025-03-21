@@ -1,5 +1,6 @@
 package xyz.sadiulhakim.executor;
 
+import xyz.sadiulhakim.resource.Monitor;
 import xyz.sadiulhakim.util.AppLogger;
 import xyz.sadiulhakim.util.CommandUtil;
 import xyz.sadiulhakim.util.FileUtil;
@@ -116,6 +117,14 @@ public class CustomCommandExecutor {
         } catch (Exception ex) {
             AppLogger.error(ex.getMessage());
         }
+    }
+
+    public static void monitorResource() {
+        Thread.ofVirtual().start(() -> {
+            Monitor monitor = new Monitor();
+            monitor.setTitle("Resources in use");
+            monitor.setVisible(true);
+        });
     }
 
     public static void watchCommand(String[] commands) {
