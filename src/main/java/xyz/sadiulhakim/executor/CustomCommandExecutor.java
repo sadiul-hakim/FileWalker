@@ -4,6 +4,7 @@ import xyz.sadiulhakim.resource.Monitor;
 import xyz.sadiulhakim.util.AppLogger;
 import xyz.sadiulhakim.util.CommandUtil;
 import xyz.sadiulhakim.util.FileUtil;
+import xyz.sadiulhakim.util.ThreadUtil;
 import xyz.sadiulhakim.watcher.FileWatcher;
 
 import java.io.File;
@@ -13,6 +14,9 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class CustomCommandExecutor {
 
@@ -34,7 +38,45 @@ public class CustomCommandExecutor {
     }
 
     public static void delCommand(String[] commands) {
-        FileUtil.delete(commands[2]);
+
+        boolean forceDelete = commands[commands.length - 1].equals("-f");
+
+        if (!forceDelete) {
+            FileUtil.delete(commands[2]);
+            return;
+        }
+
+        ProcessAccessor.clear();
+        System.out.println("Are you sure you want to delete this?");
+        System.out.println("1. Yes");
+        System.out.println("2. NO");
+        System.out.print(": ");
+
+        int opt = INPUT.nextInt();
+        if (opt != 1)
+            return;
+
+        ProcessAccessor.clear();
+        File filePath = new File(commands[2]);
+        boolean deleted;
+        if (filePath.isFile()) {
+            deleted = filePath.delete();
+        } else {
+            System.out.println("Please keep waiting this might take a while.......");
+            ExecutorService EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
+            deleted = FileUtil.deleteFileRecursively(filePath, EXECUTOR);
+            EXECUTOR.shutdown();
+            try {
+                if (!EXECUTOR.awaitTermination(10, TimeUnit.SECONDS)) {
+                    EXECUTOR.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                EXECUTOR.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+
+        }
+        System.out.println(deleted ? "Successfully deleted!" : "Something went wrong!");
     }
 
     public static void appendCommand(String[] commands) {
@@ -120,7 +162,7 @@ public class CustomCommandExecutor {
     }
 
     public static void monitorResource() {
-        Thread.ofVirtual().start(() -> {
+        ThreadUtil.EXECUTOR.submit(() -> {
             Monitor monitor = new Monitor();
             monitor.setTitle("Resources in use");
             monitor.setVisible(true);

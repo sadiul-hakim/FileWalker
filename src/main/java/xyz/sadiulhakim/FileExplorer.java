@@ -2,10 +2,7 @@ package xyz.sadiulhakim;
 
 import xyz.sadiulhakim.executor.CustomCommandExecutor;
 import xyz.sadiulhakim.executor.ProcessAccessor;
-import xyz.sadiulhakim.util.AppLogger;
-import xyz.sadiulhakim.util.DateUtil;
-import xyz.sadiulhakim.util.MathUtil;
-import xyz.sadiulhakim.util.NumberFormat;
+import xyz.sadiulhakim.util.*;
 
 import java.io.File;
 import java.time.OffsetDateTime;
@@ -33,6 +30,9 @@ public class FileExplorer {
             printPaths(files, visitedPaths);
             String text = INPUT.nextLine();
             if (text.isEmpty() || text.equalsIgnoreCase(EXIT_COMMAND)) {
+                INPUT.close();
+                ThreadUtil.EXECUTOR.shutdown();
+                System.exit(0);
                 return;
             }
 
@@ -51,7 +51,7 @@ public class FileExplorer {
             }
 
             if (!MathUtil.isInt(text)) {
-                Thread.ofVirtual().start(() -> ProcessAccessor.execute(text));
+                ThreadUtil.EXECUTOR.submit(() -> ProcessAccessor.execute(text));
                 if (visitedPaths.isEmpty()) {
                     walk(files, track, visitedPaths);
                 } else {
@@ -76,7 +76,7 @@ public class FileExplorer {
 
             if (files[index - 1].isFile()) {
                 String absolutePath = files[index - 1].getAbsolutePath();
-                Thread.ofVirtual().start(() -> ProcessAccessor.explore(absolutePath));
+                ThreadUtil.EXECUTOR.submit(() -> ProcessAccessor.explore(absolutePath));
                 walk(files, track, visitedPaths);
             }
 
@@ -99,7 +99,7 @@ public class FileExplorer {
             }
 
             // Or, Process system specific command
-            Thread.ofVirtual().start(() -> ProcessAccessor.execute(commands));
+            ThreadUtil.EXECUTOR.submit(() -> ProcessAccessor.execute(commands));
         } catch (Exception ex) {
             AppLogger.error(ex.getMessage());
         }
