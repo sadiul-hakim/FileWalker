@@ -9,7 +9,7 @@
 
 1. make {filename} `To make file`
 2. makeDir {dir_name}
-3. delete [i]
+3. delete [i], -f
 4. append , -r `to write somthing in a file. you can append or replace old text`
 5. rename [i] {to name}
 6. move
