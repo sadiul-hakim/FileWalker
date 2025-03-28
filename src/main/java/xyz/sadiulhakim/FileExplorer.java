@@ -168,8 +168,16 @@ public class FileExplorer {
         String index = i < 9 ? "0" + (i + 1) : (i + 1) + "";
         System.out.println(index + ". " +
                 finalPath + " ".repeat(10) +
+                getFileChildren(file) + " ".repeat(5) +
                 getFileDate(file) + " ".repeat(5) +
                 getFileLength(file) + " MB");
+    }
+
+    private static String getFileChildren(File file) {
+
+        if (file == null || file.list() == null)
+            return "0 items";
+        return file.list().length + " items";
     }
 
     private static String getFileDate(File file) {
