@@ -64,6 +64,8 @@ public class CustomCommandExecutor {
                 if (!EXECUTOR.awaitTermination(10, TimeUnit.SECONDS)) {
                     EXECUTOR.shutdownNow();
                 }
+
+                filePath.deleteOnExit();
             } catch (InterruptedException e) {
                 EXECUTOR.shutdownNow();
                 Thread.currentThread().interrupt();
