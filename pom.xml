@@ -53,6 +53,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>21.0.0.2</version> <!-- match your GraalVM version -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>xyz.sadiulhakim.Main</mainClass>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
