@@ -48,6 +48,8 @@ public class FileExplorer {
                 } else {
                     walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
                 }
+
+                return;
             }
 
             if (!MathUtil.isInt(text)) {
@@ -57,6 +59,8 @@ public class FileExplorer {
                 } else {
                     walk(visitedPaths.getLast().listFiles(), track, visitedPaths);
                 }
+
+                return;
             }
 
             index = Integer.parseInt(text);
@@ -78,6 +82,7 @@ public class FileExplorer {
                 String absolutePath = files[index - 1].getAbsolutePath();
                 ThreadUtil.EXECUTOR.submit(() -> ProcessAccessor.explore(absolutePath));
                 walk(files, track, visitedPaths);
+                return;
             }
 
             visitedPaths.add(files[index - 1]);
