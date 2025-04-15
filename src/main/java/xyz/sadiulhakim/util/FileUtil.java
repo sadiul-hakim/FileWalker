@@ -44,6 +44,17 @@ public class FileUtil {
         }
     }
 
+    public static Set<String> listFiles(File folder) {
+        Set<String> loadedFiles = FileCache.get(folder.getAbsolutePath());
+        if (!loadedFiles.isEmpty()) {
+            return loadedFiles;
+        }
+
+        listFiles(folder, loadedFiles);
+        FileCache.put(folder.getAbsolutePath(), loadedFiles);
+        return loadedFiles;
+    }
+
     public static void listFiles(File folder, Set<String> files) {
         files.add(folder.getAbsolutePath());
 

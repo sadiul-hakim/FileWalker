@@ -1,10 +1,7 @@
 package xyz.sadiulhakim.executor;
 
 import xyz.sadiulhakim.resource.Monitor;
-import xyz.sadiulhakim.util.AppLogger;
-import xyz.sadiulhakim.util.CommandUtil;
-import xyz.sadiulhakim.util.FileUtil;
-import xyz.sadiulhakim.util.ThreadUtil;
+import xyz.sadiulhakim.util.*;
 import xyz.sadiulhakim.watcher.FileWatcher;
 
 import java.io.File;
@@ -12,10 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class CustomCommandExecutor {
@@ -164,11 +158,11 @@ public class CustomCommandExecutor {
     public static void search(File folder) {
 
 
-        Set<String> files = new HashSet<>();
-        FileUtil.listFiles(folder, files);
+        Set<String> files = FileUtil.listFiles(folder);
         ProcessAccessor.clear();
 
         System.out.println("Enter the text you want to search. (Searching under " + folder + " folder)");
+        List<String> matchedPaths = new ArrayList<>();
         while (true) {
             System.out.print(": ");
             String text = INPUT.nextLine();
@@ -176,11 +170,22 @@ public class CustomCommandExecutor {
                 break;
 
             int counter = 1;
-            for (String file : files) {
-                if (file.substring(file.lastIndexOf(File.separator) + 1).contains(text)) {
-                    System.out.println(counter + ". " + file);
-                    counter++;
+            // Print matched folders/files name
+            if (!(text.startsWith("[") && text.endsWith("]"))) {
+                matchedPaths.clear();
+                for (String file : files) {
+                    if (file.substring(file.lastIndexOf(File.separator) + 1).contains(text)) {
+                        System.out.println(counter + ". " + file);
+                        matchedPaths.add(file);
+                        counter++;
+                    }
                 }
+            }
+
+            // Open the selected folder or file
+            if (text.startsWith("[") && text.endsWith("]") && !matchedPaths.isEmpty()) {
+                int index = MathUtil.intValue(text.replace("[", "").replace("]", ""));
+                ProcessAccessor.explore(matchedPaths.get(index - 1));
             }
         }
     }
