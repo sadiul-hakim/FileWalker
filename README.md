@@ -5,7 +5,7 @@
 3. `[/]` -> Represents current path (directory)
 4. `$` -> sign of custom command
 
-# Custom Commands `you have to start with [$]`
+# Custom Commands `you have to start with $`
 
 1. make {filename} `To make file`
 2. makeDir {dir_name}
