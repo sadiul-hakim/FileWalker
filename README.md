@@ -15,3 +15,5 @@
 6. move
 7. copy
 8. watch
+
+> To make executable file run mvn package, make sure graalvm is installed properly and currently in use.
