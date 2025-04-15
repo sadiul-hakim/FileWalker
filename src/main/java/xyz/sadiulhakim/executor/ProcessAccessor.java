@@ -2,6 +2,7 @@ package xyz.sadiulhakim.executor;
 
 import xyz.sadiulhakim.util.AppLogger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,11 +36,13 @@ public class ProcessAccessor {
 
     public static void explore(String filePath) {
         try {
-            ArrayList<String> commandList;
+            ArrayList<String> commandList = new ArrayList<>();
             if (SYSTEM.contains("win")) {
                 commandList = new ArrayList<>(PRE_COMMAND);
-            } else {
-                commandList = new ArrayList<>();
+
+                if (new File(filePath).isDirectory()) {
+                    commandList.add("explorer");
+                }
             }
 
             commandList.add(filePath);
