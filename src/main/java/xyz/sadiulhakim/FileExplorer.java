@@ -123,6 +123,7 @@ public class FileExplorer {
             case CUSTOM_COMMAND_COPY -> CustomCommandExecutor.copyCommand(commands);
             case CUSTOM_COMMAND_WATCH -> CustomCommandExecutor.watchCommand(commands);
             case CUSTOM_COMMAND_MONITOR_RESOURCE -> CustomCommandExecutor.monitorResource();
+            case CUSTOM_COMMAND_SEARCH -> CustomCommandExecutor.search(visitedPaths.getLast());
         }
     }
 

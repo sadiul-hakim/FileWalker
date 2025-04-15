@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 public class FileUtil {
@@ -42,6 +40,20 @@ public class FileUtil {
                 Files.createDirectories(path);
             } catch (IOException e) {
                 AppLogger.error(e.getMessage());
+            }
+        }
+    }
+
+    public static void listFiles(File folder, Set<String> files) {
+        files.add(folder.getAbsolutePath());
+
+        if (folder.listFiles() == null) {
+            return;
+        }
+        for (File file : folder.listFiles()) {
+            files.add(file.getAbsolutePath());
+            if (file.isDirectory()) {
+                listFiles(file, files);
             }
         }
     }

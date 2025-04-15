@@ -12,11 +12,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.concurrent.*;
 
 public class CustomCommandExecutor {
 
@@ -158,6 +158,30 @@ public class CustomCommandExecutor {
             Files.copy(Path.of(source), targetPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception ex) {
             AppLogger.error(ex.getMessage());
+        }
+    }
+
+    public static void search(File folder) {
+
+
+        Set<String> files = new HashSet<>();
+        FileUtil.listFiles(folder, files);
+        ProcessAccessor.clear();
+
+        System.out.println("Enter the text you want to search. (Searching under " + folder + " folder)");
+        while (true) {
+            System.out.print(": ");
+            String text = INPUT.nextLine();
+            if (text.equals(CommandUtil.EXIT_COMMAND))
+                break;
+
+            int counter = 1;
+            for (String file : files) {
+                if (file.substring(file.lastIndexOf(File.separator) + 1).contains(text)) {
+                    System.out.println(counter + ". " + file);
+                    counter++;
+                }
+            }
         }
     }
 

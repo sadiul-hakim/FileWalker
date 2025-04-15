@@ -12,4 +12,5 @@ public final class CommandUtil {
     public static final String CUSTOM_COMMAND_COPY = "copy";
     public static final String CUSTOM_COMMAND_WATCH = "watch";
     public static final String CUSTOM_COMMAND_MONITOR_RESOURCE = "mr";
+    public static final String CUSTOM_COMMAND_SEARCH = "search";
 }
